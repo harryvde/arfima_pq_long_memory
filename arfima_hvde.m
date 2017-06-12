@@ -10,8 +10,6 @@ if nargin<4
 theta0 = [.1; rand(p+q,1)./2];
 end
 
-% options = optimset('TolX',1e-12,'TolFun',1e-12,'Algorithm','interior-point'); %'sqp'
-% options = optimset(options,'MaxFunEvals',10000,'Display','off');
 options=optimset('Display','off','TolFun',1.0e-12,'TolX',1.0e-12);              % options for minimization
 options  =  optimset(options , 'LargeScale'  , 'off');
 options  =  optimset(options , 'GradObj'     , 'off');
@@ -48,21 +46,11 @@ theta_tilde = theta(p+2:end);
 
 delta = get_filter(theta,p);
 y_tilde = filter(delta,1,y);
-ut = filter([1 -phi],[1 +theta_tilde],y_tilde); ut(1)=[];
-% lambda = get_filter(theta,p);
-% 
-% initial = repmat(y(1),length(lambda),1);
-% reg = [initial;y];
-% ut  = filter(lambda,1,reg);
-% ut  = ut(length(lambda)+1:end);
+ut = filter([1 -phi],[1 +theta_tilde],y_tilde); 
+ut(1)=[];
 
 s2_u = cov(ut);
 LL=s2_u;
-% LL = -sum( -0.5*(log(2*pi)+log(s2_u)+ ut.^2 ));
-% 
-% if isnan(LL)
-%     LL=1e6;
-% end
 
 end
 %==========================================================================
@@ -73,19 +61,6 @@ T=evalin('caller','length(y)');
 filter_lag = ceil(min(T/4,2*sqrt(T)));
 
 d   = theta(1);
-% phi = theta(2:p+1);
-% theta_tilde = -theta(p+2:end);
-% 
-% if isempty(theta_tilde), theta_tilde=0; end
-% if isempty(phi), phi=0; end
-% 
-% lambda = zeros(filter_lag,1);
-% Psi_k = zeros(filter_lag,1);
 delta_k = [1 cumprod(((0:1:filter_lag-1)-d)./(1:1:filter_lag))];
-% Psi_k(1) = 1;
-% lambda(1) = 1;
-% for i=2:filter_lag
-%     Psi_k(i) = theta_tilde*Psi_k(i-1) + delta_k(i);
-%     lambda(i)= Psi_k(i) - phi*Psi_k(i-1);
-% end
+
 end
